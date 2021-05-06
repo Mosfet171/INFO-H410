@@ -72,23 +72,26 @@ class SnakeGame:
     def expand_row(self):
         if self.rows < 100:
             self.rows += 1
+        self.grid = []
         for i in range(self.rows):
+            self.grid.append([])
             for j in range(self.columns):
-                self.grid[i][j] = EMPTY_CHAR
+                self.grid[i].append(EMPTY_CHAR)
         self.score = 0
         self.best_score = 0
 
     def expand_column(self):
         if self.columns < 100:
             self.columns += 1
+        self.grid = []
         for i in range(self.rows):
+            self.grid.append([])
             for j in range(self.columns):
-                self.grid[i][j] = EMPTY_CHAR
+                self.grid[i].append(EMPTY_CHAR)
         self.score = 0
         self.best_score = 0
 
     def shrink_row(self):
-        print("Shrinking ROW")
         if self.rows > 1:
             self.rows -= 1
         self.grid = []
@@ -100,7 +103,6 @@ class SnakeGame:
         self.best_score = 0
 
     def shrink_column(self):
-        print("Shrinking COLUMN")
         if self.columns > 1:
             self.columns -= 1
         self.grid = []
