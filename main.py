@@ -1,11 +1,22 @@
 from thegame import *
 import heapq
 import time
+import argparse
 
 SNAKE_CHAR = '+'
 EMPTY_CHAR = ' '
 WALL_CHAR = '#'
 FOOD_CHAR = '@'
+
+parser = argparse.ArgumentParser(description="A* For Snake")
+group_solution = parser.add_mutually_exclusive_group(required=False)
+group_solution.add_argument('-i', "--interactive", action='store_true', help="Returns solution as a vector instead of the sum")
+args = parser.parse_args()
+
+if args.interactive:
+    interactive = True
+else:
+    interactive = False
 
 def main():
     class Node:
@@ -40,7 +51,7 @@ def main():
             print("Choosing next move")
 
             if not self.best_path:
-                self.best_path = astar(state)
+                self.best_path = astar(state, interactive)
 
             if self.best_path == 171:
                 next_move = self.moves[1]
@@ -60,7 +71,7 @@ def main():
                 elif next_mov_bool[1] == -1:
                     next_move = self.moves[2]
                 else:
-                    print("Problem in moves, head: ",head,", next_pos: ",next_pos)
+                    print("Problem in moves, head: ", head, ", next_pos: ", next_pos)
             elif next_mov_bool[0] == 1:
                 next_move = self.moves[1]
             elif next_mov_bool[0] == -1:
@@ -107,7 +118,8 @@ def main():
                         game.grid[el.position[0]][el.position[1]] = ' '
                     for el in closed_list:
                         game.grid[el.position[0]][el.position[1]] = ' '
-                    game.grid[food_node.position[0]][food_node.position[1]] = '@'
+                    game.grid[food_node.position[0]][food_node.position[1]] = FOOD_CHAR
+                    game.grid[head_node.position[0]][head_node.position[1]] = SNAKE_CHAR
                     game.draw()
                 return path
 
@@ -155,7 +167,10 @@ def main():
                     heapq.heappush(open_list, child)
 
                     if interactive:
-                        game.grid[child.position[0]][child.position[1]] = 'S'
+                        if game.grid[child.position[0]][child.position[1]] == '+':
+                            pass
+                        else:
+                            game.grid[child.position[0]][child.position[1]] = 'S'
                         game.draw()
 
         return 171
@@ -175,5 +190,6 @@ def main():
     #while game.is_alive():
     #    game.next_tick()
 
-if __name__ == '__main__':
-    main()
+
+#if __name__ == '__main__':
+main()
