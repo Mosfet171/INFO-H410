@@ -8,6 +8,9 @@ GREY = (120, 120, 120)
 WHITE = (200, 200, 200)
 YELLOW = (200, 200, 50)
 RED = (200, 50, 50)
+GREEN = (0, 200, 50)
+PURPLE = (200, 0, 150)
+ORANGE = (255,130,0)
 RIGHT = (0, 1)
 DOWN = (1, 0)
 LEFT = (0, -1)
@@ -16,6 +19,9 @@ SNAKE_CHAR = '+'
 EMPTY_CHAR = ' '
 WALL_CHAR = '#'
 FOOD_CHAR = '@'
+NEW_CHAR = 'A'
+S_CHAR = 'S'
+CLOSED_CHAR = 'C'
 
 
 class SnakeGame:
@@ -82,20 +88,26 @@ class SnakeGame:
         self.best_score = 0
 
     def shrink_row(self):
+        print("Shrinking ROW")
         if self.rows > 1:
             self.rows -= 1
+        self.grid = []
         for i in range(self.rows):
+            self.grid.append([])
             for j in range(self.columns):
-                self.grid[i][j] = EMPTY_CHAR
+                self.grid[i].append(EMPTY_CHAR)
         self.score = 0
         self.best_score = 0
 
     def shrink_column(self):
+        print("Shrinking COLUMN")
         if self.columns > 1:
             self.columns -= 1
+        self.grid = []
         for i in range(self.rows):
+            self.grid.append([])
             for j in range(self.columns):
-                self.grid[i][j] = EMPTY_CHAR
+                self.grid[i].append(EMPTY_CHAR)
         self.score = 0
         self.best_score = 0
 
@@ -155,6 +167,7 @@ class SnakeGame:
         self.spawn_food()
         self.start_time = time.time()
         self.current_time = self.start_time
+        print("Starting game with C=%i and R=%i"%(self.columns,self.rows))
 
     def set_next_move(self, move):
         self.next_move = move
@@ -193,7 +206,7 @@ class SnakeGame:
             return self.get_state()
 
     def get_state(self):
-        return self.grid[:self.rows][:self.columns], self.score, self.alive, self.snake[0]
+        return self.grid, self.score, self.alive, self.snake[0]
 
     def get_grid_base(self, width, height):
         menu_start = width * 2 / 3
@@ -237,6 +250,7 @@ class GUISnakeGame(SnakeGame):
         self.frame = 0
 
     def next_tick(self, learning_agent=None):
+        # time.sleep(0.5)
         self.process_event(learning_agent)
         if self.is_alive() and (self.frame / FPS >= 1 / self.get_mps() or learning_agent is not None):
             self.move_snake()
@@ -333,6 +347,12 @@ class GUISnakeGame(SnakeGame):
                         color = YELLOW
                     elif self.grid[i][j] == FOOD_CHAR:
                         color = RED
+                    elif self.grid[i][j] == NEW_CHAR:
+                        color = GREEN
+                    elif self.grid[i][j] == S_CHAR:
+                        color = PURPLE
+                    elif self.grid[i][j] == CLOSED_CHAR:
+                        color = ORANGE
                     pygame.draw.rect(screen, color, (horizontal_start + j * gap, vertical_start + i * gap, gap, gap))
 
     def draw_grid(self, screen, gap, vertical_start, horizontal_start):
@@ -381,17 +401,18 @@ class GUISnakeGame(SnakeGame):
         pygame.display.flip()
 
 
-class TrainingSnakeGame(SnakeGame):
-    def __init__(self, learning_agent):
-        super(TrainingSnakeGame, self).__init__()
-        self.learning_agent = learning_agent
-
-    def next_tick(self):
-        if self.is_alive():
-            self.set_next_move(self.learning_agent.choose_next_move(self.get_state()))
-            return self.move_snake()
-
-        return self.get_state()
+# class TrainingSnakeGame(SnakeGame):
+#     def __init__(self, learning_agent):
+#         super(TrainingSnakeGame, self).__init__()
+#         self.learning_agent = None # learning_agent
+#
+#     def next_tick(self):
+#         if self.is_alive():
+#             print("Snake is alive, state: ",self.get_state())
+#             self.set_next_move(self.learning_agent.choose_next_move(self.get_state()))
+#             return self.move_snake()
+#
+#         return self.get_state()
 
 
 def display_state_console20x20(state):
